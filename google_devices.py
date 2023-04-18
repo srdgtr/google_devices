@@ -128,7 +128,7 @@ nodig_voor_controlen = devices[
 ]
 
 num_rows: int = len(devices)
-writer = pd.ExcelWriter("active_chrome_devices" + "_" + date_today + ".xlsx", engine="xlsxwriter")
+writer = pd.ExcelWriter(f"active_chrome_devices_{date_today}.xlsx", engine="xlsxwriter")
 pandas.io.formats.excel.ExcelFormatter.header_style = None
 devices.to_excel(writer, sheet_name="chromebooks", index=False, float_format="%.2f")
 nodig_voor_controlen.to_excel(writer, sheet_name="controlelijst", index=False, float_format="%.2f")
