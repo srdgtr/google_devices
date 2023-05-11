@@ -74,28 +74,29 @@ while NEXT_PLACE_TOKEN:
 
     if chromebooks_list:
         chromebooks_list_json = json.loads(str(chromebooks_list["chromeosdevices"]).replace("'", '"').replace("\\", ""))
-        for aRow in chromebooks_list_json:
-            if aRow["status"] == "ACTIVE":
-                device_list.append(aRow)
-    if "nextPageToken" in chromebooks_list:
-        PAGE_TOKEN = chromebooks_list["nextPageToken"]
-        NEXT_PLACE_TOKEN = chromebooks_list["nextPageToken"]
-    else:
+        device_list.extend(
+            aRow
+            for aRow in chromebooks_list_json
+            if aRow["status"] == "ACTIVE"
+        )
+    if "nextPageToken" not in chromebooks_list:
         break
+    PAGE_TOKEN = chromebooks_list["nextPageToken"]
+    NEXT_PLACE_TOKEN = chromebooks_list["nextPageToken"]
 
 
 def total_usage(time_range: list[dict[str, str]]) -> int:
     if not isinstance(time_range, list):
         return 0
-    total: List[int] = []
-    for time in time_range:
-        total.append(time["activeTime"])
+    total: List[int] = [time["activeTime"] for time in time_range]
     return int(sum(total) / 6000)
 
 def support_date(unix_time:str) -> str:
-    if not isinstance(unix_time, str):
-        return ""
-    return datetime.fromtimestamp(int(unix_time)/1000)
+    return (
+        datetime.fromtimestamp(int(unix_time) / 1000)
+        if isinstance(unix_time, str)
+        else ""
+    )
 
 devices = pd.DataFrame(device_list).assign(
     usage_minuten=lambda x: x["activeTimeRanges"].apply(total_usage),
