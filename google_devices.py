@@ -1,4 +1,3 @@
-import json
 import os.path
 import pickle
 from datetime import datetime
@@ -71,14 +70,12 @@ while NEXT_PLACE_TOKEN:
     )
     chromebooks_list = get_list_chromebooks_with_request.execute()
     NEXT_PLACE_TOKEN = None
-
+    
     if chromebooks_list:
-        chromebooks_list_json = json.loads(str(chromebooks_list["chromeosdevices"]).replace("'", '"').replace("\\", ""))
-        device_list.extend(
-            aRow
-            for aRow in chromebooks_list_json
-            if aRow["status"] == "ACTIVE"
-        )
+        for device in chromebooks_list["chromeosdevices"]:
+            if device['status'] == 'ACTIVE':
+                device_list.append(device)
+
     if "nextPageToken" not in chromebooks_list:
         break
     PAGE_TOKEN = chromebooks_list["nextPageToken"]
